@@ -14,5 +14,5 @@ public interface IApplicationManager {
     boolean stopAccess(List<String> pkgNames);
     boolean grantAccess(List<String> pkgNames);
     String getApplicationPackageName(String applicationName);
-    void startApplication(String packageName);
+    boolean startApplication(String packageName);
 }

@@ -124,11 +124,19 @@ public class ApplicationManager implements IApplicationManager{
     /**
      * Launch application that is clicked by the user.
      * @param packageName
+     * @return
+     * true application can be launched.
+     * false application cannot be launched.
      */
-    public void startApplication(String packageName) {
+    public boolean startApplication(String packageName) {
         Log.d(TAG, "starting application package " + packageName);
         Intent launchIntent = mPackageManager.getLaunchIntentForPackage(packageName);
-        mContext.startActivity(launchIntent);
+        if (launchIntent != null) {
+            mContext.startActivity(launchIntent);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
