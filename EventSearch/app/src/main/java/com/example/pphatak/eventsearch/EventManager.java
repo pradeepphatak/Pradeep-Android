@@ -6,6 +6,7 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -24,24 +25,27 @@ public class EventManager implements IEventManager{
     public static final String TOKEN_VALUE = "TQV3XOU5XAZT5QYDJCAX";
     public static final String EVENTBRITE_API_VENUE_SEARCH = "https://www.eventbriteapi.com/v3/venues/";
     private String mEventsJson;
+    private WeakReference<IEventNotify> mEventNotify;
 
-    EventManager(final IEventNotify eventNotify) {
+    public EventManager(IEventNotify eventNotify) {
+        mEventNotify = new WeakReference<>(eventNotify);
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
+                List<Event> events = (List<Event>)msg.obj;
+                IEventNotify evtNotify= (IEventNotify) mEventNotify.get();
+                if (evtNotify == null) {
+                    Log.e(TAG, "Main Activity is null");
+                    return;
+                }
                 switch(msg.what) {
                     case EVENT_LIST_RECEIVED:
                         Log.d(TAG, "Event list updated");
-                        List<Event> events = (List<Event>)msg.obj;
-                        if (eventNotify != null) {
-                            eventNotify.onEventsReceived(events);
-                        }
+                        evtNotify.onEventsReceived(events);
                         break;
                     case EVENT_LIST_NOT_RECEIVED:
                         Log.d(TAG, "Event list not updated");
-                        if (eventNotify != null) {
-                            eventNotify.onEventsReceived(null);
-                        }
+                        evtNotify.onEventsReceived(null);
                         break;
                 }
             }
